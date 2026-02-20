@@ -53,6 +53,8 @@ const CategoryPage = () => {
   const endIndex = Math.min(startIndex + itemsPerPage, filtered.length);
   const paginatedProducts = filtered.slice(startIndex, endIndex);
 
+  const [availableColors, setAvailableColors] = useState<{ name: string; value: string }[]>([]);
+
   const fetchData = async () => {
     try {
       const response = await fetch('/api/all');
@@ -65,6 +67,44 @@ const CategoryPage = () => {
         const prices = products.map(p => p.price);
         setMinPrice(Math.floor(Math.min(...prices)));
         setMaxPrice(Math.ceil(Math.max(...prices)));
+
+        // Extract unique colors
+        const colorMap = new Map<string, string>();
+        products.forEach(p => {
+          if (p.color) {
+            p.color.split(',').forEach(c => {
+              const name = c.trim();
+              if (name && !colorMap.has(name.toLowerCase())) {
+                // simple mapping for common colors, otherwise use name as class if it's a valid hex or just default to gray
+                colorMap.set(name.toLowerCase(), name);
+              }
+            });
+          }
+        });
+
+        const colorList = Array.from(colorMap.values()).map(name => {
+          const lower = name.toLowerCase();
+
+          // Design palette hex codes
+          const hexPalette: Record<string, string> = {
+            'green': '#00C12B',
+            'red': '#F50606',
+            'yellow': '#F5DD06',
+            'orange': '#F57906',
+            'cyan': '#06CAF5',
+            'blue': '#063AF5',
+            'purple': '#7D06F5',
+            'pink': '#F506A4',
+            'white': '#FFFFFF',
+            'black': '#000000',
+          };
+
+          return {
+            name,
+            value: hexPalette[lower] || name // Use mapped hex, or the name/hex itself
+          };
+        });
+        setAvailableColors(colorList);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -76,11 +116,11 @@ const CategoryPage = () => {
   }, []);
 
   const handleApplyFilters = (filters: any) => {
-    const { priceRange, color, size } = filters;
+    const { priceRange, colors, size } = filters;
     const newFiltered = all.filter(p => {
       const matchesPrice = p.price >= priceRange.min && p.price <= priceRange.max;
-      const matchesColor = !color || (p.color && p.color.toLowerCase().includes(color.toLowerCase()));
-      // We can add size filter here as well if needed
+      const productColors = p.color ? p.color.split(',').map(c => c.trim().toLowerCase()) : [];
+      const matchesColor = !colors || colors.length === 0 || colors.some((c: string) => productColors.includes(c.toLowerCase()));
       return matchesPrice && matchesColor;
     });
     setFiltered(newFiltered);
@@ -141,7 +181,7 @@ const CategoryPage = () => {
         <main className="flex-1">
           <div className="flex gap-8 md:mt-26 mt-8">
             <div className="md:flex hidden">
-              <SideBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} />
+              <SideBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} availableColors={availableColors} />
             </div>
             <div className="flex flex-wrap md:ml-0 overflow-hidden md:-mt-24">
               <div className="flex flex-col gap-4 items-start md:ml-0 md:mr-0 mr-4 ml-5 md:mt-8 w-full">
@@ -164,7 +204,7 @@ const CategoryPage = () => {
           </div>
         </main>
       </div>
-      <MobileBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} />
+      <MobileBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} availableColors={availableColors} />
     </div>
   );
 };

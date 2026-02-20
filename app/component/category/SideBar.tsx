@@ -6,11 +6,12 @@ interface SideBarProps {
     onApply?: (filters: any) => void;
     minBoundary?: number;
     maxBoundary?: number;
+    availableColors?: { name: string; value: string }[];
 }
 
-const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: SideBarProps) => {
+const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColors = [] }: SideBarProps) => {
     // State for interactive elements to mimic the "selected" look in the design
-    const [selectedColor, setSelectedColor] = useState('Blue'); // Blue selected by default
+    const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [selectedSize, setSelectedSize] = useState('Large'); // Large selected by default
     const [priceRange, setPriceRange] = useState({ min: minBoundary, max: maxBoundary });
 
@@ -20,20 +21,6 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: SideBarProps
     }, [minBoundary, maxBoundary]);
 
     const categories = ['T-shirts', 'Shorts', 'Shirts', 'Hoodie', 'Jeans'];
-
-    // Curated color palette from the design
-    const colors = [
-        { name: 'Green', class: 'bg-[#00C12B]' },
-        { name: 'Red', class: 'bg-[#F50606]' },
-        { name: 'Yellow', class: 'bg-[#F5DD06]' },
-        { name: 'Orange', class: 'bg-[#F57906]' },
-        { name: 'Cyan', class: 'bg-[#06CAF5]' },
-        { name: 'Blue', class: 'bg-[#063AF5]' },
-        { name: 'Purple', class: 'bg-[#7D06F5]' },
-        { name: 'Pink', class: 'bg-[#F506A4]' },
-        { name: 'White', class: 'bg-white border border-black/10' },
-        { name: 'Black', class: 'bg-black' }
-    ];
 
     const sizes = ['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'];
     const dressStyles = ['Casual', 'Formal', 'Party', 'Gym'];
@@ -48,11 +35,19 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: SideBarProps
         }
     };
 
+    const toggleColor = (name: string) => {
+        setSelectedColors(prev =>
+            prev.includes(name)
+                ? prev.filter(c => c !== name)
+                : [...prev, name]
+        );
+    };
+
     const handleApply = () => {
         if (onApply) {
             onApply({
                 priceRange,
-                color: selectedColor,
+                colors: selectedColors,
                 size: selectedSize,
             });
         }
@@ -126,14 +121,15 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: SideBarProps
                     <ChevronUp className="w-5 h-5 text-black" />
                 </div>
                 <div className="grid grid-cols-5 gap-y-3 gap-x-2">
-                    {colors.map((color, i) => (
+                    {availableColors.map((color, i) => (
                         <button
                             key={i}
-                            onClick={() => setSelectedColor(color.name)}
-                            className={`relative w-9 h-9 rounded-full ${color.class} cursor-pointer hover:scale-110 transition-all flex items-center justify-center`}
+                            onClick={() => toggleColor(color.name)}
+                            style={{ backgroundColor: color.value }}
+                            className={`relative w-9 h-9 rounded-full cursor-pointer hover:scale-110 transition-all flex items-center justify-center ${color.name.toLowerCase() === 'white' ? 'border border-black/10' : ''}`}
                         >
-                            {selectedColor === color.name && (
-                                <Check className={`w-4 h-4 ${color.name === 'White' ? 'text-black' : 'text-white'}`} />
+                            {selectedColors.includes(color.name) && (
+                                <Check className={`w-4 h-4 ${color.name.toLowerCase() === 'white' ? 'text-black' : 'text-white'}`} />
                             )}
                         </button>
                     ))}

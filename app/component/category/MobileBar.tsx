@@ -8,15 +8,15 @@ interface MobileBarProps {
     onApply?: (filters: any) => void;
     minBoundary?: number;
     maxBoundary?: number;
+    availableColors?: { name: string; value: string }[];
 }
 
-const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarProps) => {
-    const [selectedColor, setSelectedColor] = useState('Blue');
+const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColors = [] }: MobileBarProps) => {
+    const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [selectedSize, setSelectedSize] = useState('Large');
     const [priceRange, setPriceRange] = useState({ min: minBoundary, max: maxBoundary });
     const dispatch = useAppDispatch();
 
-    // Sync price range if boundaries change (e.g. data loaded)
     useEffect(() => {
         setPriceRange({ min: minBoundary, max: maxBoundary });
     }, [minBoundary, maxBoundary]);
@@ -27,20 +27,6 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
 
 
     const categories = ['T-shirts', 'Shorts', 'Shirts', 'Hoodie', 'Jeans'];
-
-    // Curated color palette from the design
-    const colors = [
-        { name: 'Green', class: 'bg-[#00C12B]' },
-        { name: 'Red', class: 'bg-[#F50606]' },
-        { name: 'Yellow', class: 'bg-[#F5DD06]' },
-        { name: 'Orange', class: 'bg-[#F57906]' },
-        { name: 'Cyan', class: 'bg-[#06CAF5]' },
-        { name: 'Blue', class: 'bg-[#063AF5]' },
-        { name: 'Purple', class: 'bg-[#7D06F5]' },
-        { name: 'Pink', class: 'bg-[#F506A4]' },
-        { name: 'White', class: 'bg-white border border-black/10' },
-        { name: 'Black', class: 'bg-black' }
-    ];
 
     const sizes = ['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'];
     const dressStyles = ['Casual', 'Formal', 'Party', 'Gym'];
@@ -55,11 +41,19 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
         }
     };
 
+    const toggleColor = (name: string) => {
+        setSelectedColors(prev =>
+            prev.includes(name)
+                ? prev.filter(c => c !== name)
+                : [...prev, name]
+        );
+    };
+
     const handleApply = () => {
         if (onApply) {
             onApply({
                 priceRange,
-                color: selectedColor,
+                colors: selectedColors,
                 size: selectedSize,
             });
         }
@@ -67,7 +61,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
     };
 
     return (
-        <div className="fixed inset-0 z-[100] md:hidden translate-y-18">
+        <div className="fixed inset-0 z-[100] md:hidden translate-y-18 pb-16">
             {/* Overlay */}
             <div
                 className="absolute inset-0 bg-black/50"
@@ -75,7 +69,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
             />
 
             {/* Content */}
-            <div className="absolute bottom-0 left-0 right-0 h-[90vh] bg-white rounded-t-[20px] p-5 overflow-y-auto transition-transform">
+            <div className="absolute bottom-0 left-0 right-0 h-[90vh] bg-white rounded-t-[20px] p-5 overflow-y-auto transition-transform pb-24">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6 pb-6 border-b border-black/10">
                     <h3 className="text-xl font-bold text-black">Filters</h3>
@@ -140,14 +134,15 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
                         <ChevronUp className="w-5 h-5 text-black" />
                     </div>
                     <div className="grid grid-cols-5 gap-y-3 gap-x-2">
-                        {colors.map((color, i) => (
+                        {availableColors.map((color, i) => (
                             <button
                                 key={i}
-                                onClick={() => setSelectedColor(color.name)}
-                                className={`relative w-9 h-9 rounded-full ${color.class} cursor-pointer hover:scale-110 transition-all flex items-center justify-center`}
+                                onClick={() => toggleColor(color.name)}
+                                style={{ backgroundColor: color.value }}
+                                className={`relative w-9 h-9 rounded-full cursor-pointer hover:scale-110 transition-all flex items-center justify-center ${color.name.toLowerCase() === 'white' ? 'border border-black/10' : ''}`}
                             >
-                                {selectedColor === color.name && (
-                                    <Check className={`w-4 h-4 ${color.name === 'White' ? 'text-black' : 'text-white'}`} />
+                                {selectedColors.includes(color.name) && (
+                                    <Check className={`w-4 h-4 ${color.name.toLowerCase() === 'white' ? 'text-black' : 'text-white'}`} />
                                 )}
                             </button>
                         ))}
@@ -195,7 +190,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
                 {/* Apply Button */}
                 <button
                     onClick={handleApply}
-                    className="w-full py-4 bg-black text-white rounded-full font-medium hover:bg-black/90 transition-all cursor-pointer active:scale-[0.98] mb-4"
+                    className="w-full py-4 bg-black text-white rounded-full font-medium hover:bg-black/90 transition-all cursor-pointer active:scale-[0.98]"
                 >
                     Apply Filter
                 </button>
