@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -17,8 +17,9 @@ import { useAppDispatch } from "@/app/store/hooks";
 import { openModal } from "@/app/store/modalSlice";
 import { ProductType } from "@/app/utils/type/landing";
 
-const mapPostsToProducts = (posts: any[]): ProductType[] =>
-  posts.map((p) => {
+const mapPostsToProducts = (posts: unknown[]): ProductType[] =>
+  (posts as any[]).map((p) => {
+
     const id = p.id;
     const slug = p.slug;
     const name = (p.title?.rendered || "").replace(/<[^>]+>/g, "").trim();
@@ -46,12 +47,30 @@ const CategoryPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000);
+  const [sortBy, setSortBy] = useState("trending");
+  const [isSortOpen, setIsSortOpen] = useState(false);
+
   const itemsPerPage = 12;
 
-  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const sortedProducts = useMemo(() => {
+    const sorted = [...filtered];
+    if (sortBy === "low-price") {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "high-price") {
+      sorted.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "review") {
+      sorted.sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === "trending") {
+      sorted.sort((a, b) => b.id - a.id);
+    }
+    return sorted;
+  }, [filtered, sortBy]);
+
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filtered.length);
-  const paginatedProducts = filtered.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedProducts.length);
+  const paginatedProducts = sortedProducts.slice(startIndex, endIndex);
+
 
   const [availableColors, setAvailableColors] = useState<{ name: string; value: string }[]>([]);
 
@@ -112,11 +131,20 @@ const CategoryPage = () => {
   }
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [sortBy]);
+
+  useEffect(() => {
     fetchData();
   }, []);
 
-  const handleApplyFilters = (filters: any) => {
-    const { priceRange, colors, size } = filters;
+  const handleApplyFilters = (filters: {
+    priceRange: { min: number, max: number },
+    colors: string[],
+    size: string
+  }) => {
+    const { priceRange, colors } = filters;
+
     const newFiltered = all.filter(p => {
       const matchesPrice = p.price >= priceRange.min && p.price <= priceRange.max;
       const productColors = p.color ? p.color.split(',').map(c => c.trim().toLowerCase()) : [];
@@ -136,7 +164,8 @@ const CategoryPage = () => {
           {/* Desktop */}
           <div className="hidden md:flex items-center justify-between md:w-[700px] w-full px-4 pt-4">
             <span className="text-black/60 text-xs md:text-sm">
-              Showing {filtered.length > 0 ? startIndex + 1 : 0}-{endIndex} of {filtered.length} Products
+              Showing {sortedProducts.length > 0 ? startIndex + 1 : 0}-{endIndex} of {sortedProducts.length} Products
+
             </span>
             <div className="flex items-center justify-between md:justify-end gap-2 md:gap-4 text-sm md:text-base">
               <button
@@ -146,33 +175,95 @@ const CategoryPage = () => {
                 <SlidersHorizontal className="w-5 h-5 text-black" />
               </button>
             </div>
-            <div className="md:flex hidden items-center gap-1 cursor-pointer group">
-              <span className="text-black/60">Sort by:</span>
-              <span className="text-black font-bold">Most Popular</span>
-              <ChevronDown className="w-4 h-4 text-black group-hover:translate-y-0.5 transition-transform" />
+            <div className="relative md:flex hidden">
+              <div
+                className="flex items-center gap-1 cursor-pointer group"
+                onClick={() => setIsSortOpen(!isSortOpen)}
+              >
+                <span className="text-black/60">Sort by:</span>
+                <span className="text-black font-bold">
+                  {sortBy === "low-price" && "Low Price"}
+                  {sortBy === "high-price" && "High Price"}
+                  {sortBy === "review" && "Review"}
+                  {sortBy === "trending" && "Trending"}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-black transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+              </div>
+
+              {isSortOpen && (
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                  {[
+                    { id: 'trending', label: 'Trending' },
+                    { id: 'low-price', label: 'Low Price' },
+                    { id: 'high-price', label: 'High Price' },
+                    { id: 'review', label: 'Review' },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        setSortBy(option.id);
+                        setIsSortOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${sortBy === option.id ? 'text-black font-bold' : 'text-gray-600'
+                        }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
           </div>
-          {/* Mobilee */}
-          <div className="md:hidden flex items-center justify-between w-full pl-6 pr-4 pt-2">
-            <h1 className="text-lg md:text-3xl font-bold text-black normal-case">
-              Casual
-            </h1>
-            <span className="text-black/60 text-xs md:text-sm">
-              Showing {filtered.length > 0 ? startIndex + 1 : 0}-{endIndex} of {filtered.length} Products
+          {/* Mobile */}
+          <div className="md:hidden flex flex-col w-full px-4 pt-4 gap-1">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-black normal-case">
+                Casual
+              </h1>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => dispatch(openModal("filter"))}
+                  className="p-2.5 bg-[#F0F0F0] rounded-full hover:bg-black/5 transition-colors"
+                >
+                  <SlidersHorizontal className="w-5 h-5 text-black" />
+                </button>
+                <div className="relative">
+                  <div
+                    className="flex items-center gap-1 cursor-pointer"
+                    onClick={() => setIsSortOpen(!isSortOpen)}
+                  >
+                    <ChevronDown className={`w-5 h-5 text-black transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+                  </div>
+
+                  {isSortOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden py-1">
+                      {[
+                        { id: 'trending', label: 'Trending' },
+                        { id: 'low-price', label: 'Low Price' },
+                        { id: 'high-price', label: 'High Price' },
+                        { id: 'review', label: 'Review' },
+                      ].map((option) => (
+                        <button
+                          key={option.id}
+                          onClick={() => {
+                            setSortBy(option.id);
+                            setIsSortOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${sortBy === option.id ? 'text-black font-bold' : 'text-gray-600'
+                            }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <span className="text-black/60 text-xs">
+              Showing {sortedProducts.length > 0 ? startIndex + 1 : 0}-{endIndex} of {sortedProducts.length} Products
             </span>
-            <div className="flex items-center justify-between md:justify-end gap-2 md:gap-4 text-sm md:text-base">
-              <button
-                onClick={() => dispatch(openModal("filter"))}
-                className="md:hidden p-2 bg-[#F0F0F0] rounded-full"
-              >
-                <SlidersHorizontal className="w-5 h-5 text-black" />
-              </button>
-            </div>
-            <div className="md:flex hidden items-center gap-1 cursor-pointer group">
-              <span className="text-black/60">Sort by:</span>
-              <span className="text-black font-bold">Most Popular</span>
-              <ChevronDown className="w-4 h-4 text-black group-hover:translate-y-0.5 transition-transform" />
-            </div>
           </div>
         </div>
       </div>

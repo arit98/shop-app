@@ -1,4 +1,4 @@
-export const allProducts: Product[] = [
+export const allProducts: any[] = [
     {
         id: 1,
         name: "T-shirt with Tape Details",
