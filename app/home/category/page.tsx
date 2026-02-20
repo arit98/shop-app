@@ -43,6 +43,8 @@ const CategoryPage = () => {
   const [all, setAll] = useState<ProductType[]>([]);
   const [filtered, setFiltered] = useState<ProductType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const itemsPerPage = 12;
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -57,6 +59,12 @@ const CategoryPage = () => {
       const products = Array.isArray(result) ? mapPostsToProducts(result) : [];
       setAll(products);
       setFiltered(products); // Initially show all
+
+      if (products.length > 0) {
+        const prices = products.map(p => p.price);
+        setMinPrice(Math.floor(Math.min(...prices)));
+        setMaxPrice(Math.ceil(Math.max(...prices)));
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
@@ -131,7 +139,7 @@ const CategoryPage = () => {
         <main className="flex-1">
           <div className="flex gap-8 md:mt-26 mt-8">
             <div className="md:flex hidden">
-              <SideBar />
+              <SideBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} />
             </div>
             <div className="flex flex-wrap md:ml-0 overflow-hidden md:-mt-24">
               <div className="flex flex-col gap-4 items-start md:ml-0 md:mr-0 mr-4 ml-5 md:mt-8 w-full">
@@ -154,7 +162,7 @@ const CategoryPage = () => {
           </div>
         </main>
       </div>
-      <MobileBar />
+      <MobileBar onApply={handleApplyFilters} minBoundary={minPrice} maxBoundary={maxPrice} />
     </div>
   );
 };

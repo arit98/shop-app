@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProductType } from '@/app/utils/type/landing';
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -29,19 +29,31 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 const ProductsRow = ({ name, products }: { name: string; products: ProductType[] }) => {
     const pathname = usePathname();
+    const isCategoryPage = pathname.includes("/category");
+    const [visibleCount, setVisibleCount] = useState(isCategoryPage ? 100 : 4);
 
     useEffect(() => {
-        console.log(products);
-    }, [])
+        // Reset visible count if products change (e.g. searching/filtering)
+        if (!isCategoryPage) {
+            setVisibleCount(4);
+        } else {
+            setVisibleCount(products.length || 100);
+        }
+    }, [products, isCategoryPage])
+
+    const handleViewAll = () => {
+        setVisibleCount(products.length);
+    };
+
+    const displayProducts = products?.slice(0, visibleCount);
 
     return (
         <section className={`${pathname.includes("/home") ? "" : "pt-20"}`}>
             <div className="max-w-[1440px] mx-auto">
                 {pathname.includes("/home") ? "" : <h2 className="text-4xl md:text-5xl font-black text-center mb-14 uppercase tracking-tighter">{name}</h2>}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-7 mb-14">
-                    {products?.map((product) => (
+                    {displayProducts?.map((product) => (
                         <Link href={`/home/shop/men/t-shirts/${product.slug || product.id}`} key={product.id} className="flex flex-col group cursor-pointer">
-                            {/* Image Wrapper */}
                             <div className="relative aspect-[1/1.1] bg-[#F0EEED] md:rounded-[20px] rounded-md overflow-hidden mb-4">
                                 <Image
                                     src={product.image}
@@ -53,7 +65,6 @@ const ProductsRow = ({ name, products }: { name: string; products: ProductType[]
                                 />
                             </div>
 
-                            {/* Product Info */}
                             <h3 className="text-xs md:text-xl text-center font-bold text-black mb-1 line-clamp-1">
                                 {product.name}
                             </h3>
@@ -81,14 +92,16 @@ const ProductsRow = ({ name, products }: { name: string; products: ProductType[]
                     ))}
                 </div>
 
-                {
-                    pathname.includes("/home") ? "" :
-                        < div className="flex justify-center mb-16">
-                            <button className="px-14 py-4 border border-black/10 rounded-full text-black font-medium hover:bg-black hover:text-white transition-all w-full md:w-fit cursor-pointer">
-                                View All
-                            </button>
-                        </div>
-                }
+                {products.length > visibleCount && (
+                    <div className="flex justify-center mb-16">
+                        <button
+                            onClick={handleViewAll}
+                            className="px-14 py-4 border border-black/10 rounded-full text-black font-medium hover:bg-black hover:text-white transition-all w-full md:w-fit cursor-pointer"
+                        >
+                            View All
+                        </button>
+                    </div>
+                )}
 
                 <div className="w-full h-px bg-black/10"></div>
             </div>

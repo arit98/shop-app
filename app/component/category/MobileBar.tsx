@@ -1,14 +1,25 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronUp, Check, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { closeModal } from '@/app/store/modalSlice';
 
-const MobileBar = () => {
+interface MobileBarProps {
+    onApply?: (filters: any) => void;
+    minBoundary?: number;
+    maxBoundary?: number;
+}
+
+const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarProps) => {
     const [selectedColor, setSelectedColor] = useState('bg-[#063AF5]');
     const [selectedSize, setSelectedSize] = useState('Large');
-    const [priceRange, setPriceRange] = useState({ min: 50, max: 200 });
+    const [priceRange, setPriceRange] = useState({ min: minBoundary, max: maxBoundary });
     const dispatch = useAppDispatch();
+
+    // Sync price range if boundaries change (e.g. data loaded)
+    useEffect(() => {
+        setPriceRange({ min: minBoundary, max: maxBoundary });
+    }, [minBoundary, maxBoundary]);
 
     const { isOpen, modalType } = useAppSelector((state) => state.modal);
 
@@ -26,6 +37,27 @@ const MobileBar = () => {
 
     const sizes = ['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'];
     const dressStyles = ['Casual', 'Formal', 'Party', 'Gym'];
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'min' | 'max') => {
+        const value = parseInt(e.target.value);
+        const step = (maxBoundary - minBoundary) / 100 || 1;
+        if (type === 'min') {
+            setPriceRange(prev => ({ ...prev, min: Math.min(value, prev.max - step) }));
+        } else {
+            setPriceRange(prev => ({ ...prev, max: Math.max(value, prev.min + step) }));
+        }
+    };
+
+    const handleApply = () => {
+        if (onApply) {
+            onApply({
+                priceRange,
+                color: selectedColor,
+                size: selectedSize,
+            });
+        }
+        dispatch(closeModal());
+    };
 
     return (
         <div className="fixed inset-0 z-[100] md:hidden translate-y-18">
@@ -59,22 +91,35 @@ const MobileBar = () => {
                         <h3 className="text-xl font-bold text-black">Price</h3>
                         <ChevronUp className="w-5 h-5 text-black" />
                     </div>
-                    <div className="px-2">
-                        <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full mt-6 mb-4">
+                    <div className="px-2 pb-4">
+                        <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full mt-8 mb-6">
                             <div
                                 className="absolute h-full bg-black rounded-full"
-                                style={{ left: '20%', right: '30%' }}
+                                style={{
+                                    left: `${((priceRange.min - minBoundary) / (maxBoundary - minBoundary)) * 100}%`,
+                                    right: `${100 - ((priceRange.max - minBoundary) / (maxBoundary - minBoundary)) * 100}%`
+                                }}
                             />
-                            <div
-                                className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-black rounded-full border-[3px] border-white shadow-sm cursor-pointer"
-                                style={{ left: '20%' }}
+                            <input
+                                type="range"
+                                min={minBoundary}
+                                max={maxBoundary}
+                                value={priceRange.min}
+                                onChange={(e) => handlePriceChange(e, 'min')}
+                                className="absolute w-full h-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md cursor-pointer top-0"
+                                style={{ zIndex: priceRange.min > (maxBoundary + minBoundary) / 2 ? 5 : 4 }}
                             />
-                            <div
-                                className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-black rounded-full border-[3px] border-white shadow-sm cursor-pointer"
-                                style={{ right: '30%' }}
+                            <input
+                                type="range"
+                                min={minBoundary}
+                                max={maxBoundary}
+                                value={priceRange.max}
+                                onChange={(e) => handlePriceChange(e, 'max')}
+                                className="absolute w-full h-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-black [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md cursor-pointer top-0"
+                                style={{ zIndex: priceRange.max < (maxBoundary + minBoundary) / 2 ? 5 : 4 }}
                             />
                         </div>
-                        <div className="flex justify-between text-sm font-medium text-black">
+                        <div className="flex justify-between text-sm font-medium text-black mt-2">
                             <span>${priceRange.min}</span>
                             <span>${priceRange.max}</span>
                         </div>
@@ -142,7 +187,7 @@ const MobileBar = () => {
 
                 {/* Apply Button */}
                 <button
-                    onClick={() => dispatch(closeModal())}
+                    onClick={handleApply}
                     className="w-full py-4 bg-black text-white rounded-full font-medium hover:bg-black/90 transition-all cursor-pointer active:scale-[0.98] mb-4"
                 >
                     Apply Filter
