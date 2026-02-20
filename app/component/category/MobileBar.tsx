@@ -11,7 +11,7 @@ interface MobileBarProps {
 }
 
 const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarProps) => {
-    const [selectedColor, setSelectedColor] = useState('bg-[#063AF5]');
+    const [selectedColor, setSelectedColor] = useState('Blue');
     const [selectedSize, setSelectedSize] = useState('Large');
     const [priceRange, setPriceRange] = useState({ min: minBoundary, max: maxBoundary });
     const dispatch = useAppDispatch();
@@ -30,9 +30,16 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
 
     // Curated color palette from the design
     const colors = [
-        'bg-[#00C12B]', 'bg-[#F50606]', 'bg-[#F5DD06]', 'bg-[#F57906]',
-        'bg-[#06CAF5]', 'bg-[#063AF5]', 'bg-[#7D06F5]', 'bg-[#F506A4]',
-        'bg-white border border-black/10', 'bg-black'
+        { name: 'Green', class: 'bg-[#00C12B]' },
+        { name: 'Red', class: 'bg-[#F50606]' },
+        { name: 'Yellow', class: 'bg-[#F5DD06]' },
+        { name: 'Orange', class: 'bg-[#F57906]' },
+        { name: 'Cyan', class: 'bg-[#06CAF5]' },
+        { name: 'Blue', class: 'bg-[#063AF5]' },
+        { name: 'Purple', class: 'bg-[#7D06F5]' },
+        { name: 'Pink', class: 'bg-[#F506A4]' },
+        { name: 'White', class: 'bg-white border border-black/10' },
+        { name: 'Black', class: 'bg-black' }
     ];
 
     const sizes = ['XX-Small', 'X-Small', 'Small', 'Medium', 'Large', 'X-Large', 'XX-Large', '3X-Large', '4X-Large'];
@@ -136,11 +143,11 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000 }: MobileBarP
                         {colors.map((color, i) => (
                             <button
                                 key={i}
-                                onClick={() => setSelectedColor(color)}
-                                className={`relative w-9 h-9 rounded-full ${color} cursor-pointer hover:scale-110 transition-all flex items-center justify-center`}
+                                onClick={() => setSelectedColor(color.name)}
+                                className={`relative w-9 h-9 rounded-full ${color.class} cursor-pointer hover:scale-110 transition-all flex items-center justify-center`}
                             >
-                                {selectedColor === color && (
-                                    <Check className={`w-4 h-4 ${color === 'bg-white border border-black/10' ? 'text-black' : 'text-white'}`} />
+                                {selectedColor === color.name && (
+                                    <Check className={`w-4 h-4 ${color.name === 'White' ? 'text-black' : 'text-white'}`} />
                                 )}
                             </button>
                         ))}

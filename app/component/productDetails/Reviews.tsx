@@ -102,7 +102,7 @@ const Reviews = () => {
                                 Latest
                                 <ChevronDown className="w-5 h-5" />
                             </button>
-                            <button className="bg-black text-white px-8 py-3 rounded-full font-medium hover:bg-black/90 transition-all">
+                            <button className="bg-black text-white px-8 py-3 rounded-full md:text-md text-xs font-medium hover:bg-black/90 transition-all">
                                 Write a Review
                             </button>
                         </div>

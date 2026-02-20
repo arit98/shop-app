@@ -76,11 +76,12 @@ const CategoryPage = () => {
   }, []);
 
   const handleApplyFilters = (filters: any) => {
-    const { priceRange, category, style } = filters;
+    const { priceRange, color, size } = filters;
     const newFiltered = all.filter(p => {
       const matchesPrice = p.price >= priceRange.min && p.price <= priceRange.max;
-      // Add more filter logic here when data is available
-      return matchesPrice;
+      const matchesColor = !color || (p.color && p.color.toLowerCase().includes(color.toLowerCase()));
+      // We can add size filter here as well if needed
+      return matchesPrice && matchesColor;
     });
     setFiltered(newFiltered);
     setCurrentPage(1);
