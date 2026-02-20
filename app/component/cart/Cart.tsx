@@ -57,11 +57,13 @@ const Cart = () => {
             setIsLoaded(true);
         };
 
+        // load initial cart
         loadCart();
         window.addEventListener('cartUpdated', loadCart);
         return () => window.removeEventListener('cartUpdated', loadCart);
     }, []);
 
+    // calculate totals
     const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const discount = subtotal * 0.2;
     const deliveryFee = cartItems.length > 0 ? 15 : 0;
@@ -80,6 +82,7 @@ const Cart = () => {
         newCart.splice(index, 1);
         localStorage.setItem('cart', JSON.stringify(newCart));
         setCartItems(newCart);
+        // notify update
         window.dispatchEvent(new Event('cartUpdated'));
     };
 
@@ -92,13 +95,13 @@ const Cart = () => {
 
     return (
         <div className="max-w-[1440px] mx-auto px-0 md:px-17">
-            {/* Breadcrumb */}
+            {/* navigation */}
             <PageNavigate />
 
             <h1 className="text-lg md:text-4xl font-extrabold uppercase tracking-tighter mb-8 px-6 py-4">Your Cart</h1>
 
             <div className="flex flex-col lg:flex-row gap-8 px-6">
-                {/* Left Side - Cart Items */}
+                {/* cart items section */}
                 <div className="flex-1 border border-gray-200 rounded-2xl px-6 lg:w-[400px] w-full mt-0">
                     {cartItems.map((item, index) => (
                         <CartItem
@@ -110,7 +113,7 @@ const Cart = () => {
                     ))}
                 </div>
 
-                {/* Right Side - Order Summary */}
+                {/* summary section */}
                 <div className="w-full lg:w-[500px]">
                     <div className="border border-gray-200 rounded-2xl p-6 flex flex-col gap-6">
                         <h2 className="text-xl font-bold">Order Summary</h2>

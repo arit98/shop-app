@@ -7,6 +7,7 @@ import ProductsRow from "@/app/component/landing/Products";
 import PageNavigate from "@/app/component/PageNavigate";
 import { ProductType } from "@/app/utils/type/landing";
 
+// map post data
 const mapPostsToProducts = (posts: any[]): ProductType[] =>
   posts.map((p) => {
     const id = p.id;
@@ -44,6 +45,7 @@ const ProductPage = () => {
   const [rel, setRel] = useState<ProductType[]>([]);
 
   useEffect(() => {
+    // fetch related data
     const fetchData = async () => {
       try {
         const response = await fetch("/api/releted");
@@ -62,7 +64,7 @@ const ProductPage = () => {
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 md:px-20 lg:px-26 py-8 flex flex-col gap-16">
-      {/* Breadcrumbs */}
+      {/* navigation */}
       <PageNavigate />
       <Product id={id} />
       <Reviews />

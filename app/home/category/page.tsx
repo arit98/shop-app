@@ -74,27 +74,27 @@ const CategoryPage = () => {
 
   const [availableColors, setAvailableColors] = useState<{ name: string; value: string }[]>([]);
 
+  // fetch api data
   const fetchData = async () => {
     try {
       const response = await fetch('/api/all');
       const result = await response.json();
       const products = Array.isArray(result) ? mapPostsToProducts(result) : [];
       setAll(products);
-      setFiltered(products); // Initially show all
+      setFiltered(products);
 
       if (products.length > 0) {
         const prices = products.map(p => p.price);
         setMinPrice(Math.floor(Math.min(...prices)));
         setMaxPrice(Math.ceil(Math.max(...prices)));
 
-        // Extract unique colors
+        // extract colors
         const colorMap = new Map<string, string>();
         products.forEach(p => {
           if (p.color) {
             p.color.split(',').forEach(c => {
               const name = c.trim();
               if (name && !colorMap.has(name.toLowerCase())) {
-                // simple mapping for common colors, otherwise use name as class if it's a valid hex or just default to gray
                 colorMap.set(name.toLowerCase(), name);
               }
             });
@@ -103,8 +103,6 @@ const CategoryPage = () => {
 
         const colorList = Array.from(colorMap.values()).map(name => {
           const lower = name.toLowerCase();
-
-          // Design palette hex codes
           const hexPalette: Record<string, string> = {
             'green': '#00C12B',
             'red': '#F50606',
@@ -120,7 +118,7 @@ const CategoryPage = () => {
 
           return {
             name,
-            value: hexPalette[lower] || name // Use mapped hex, or the name/hex itself
+            value: hexPalette[lower] || name
           };
         });
         setAvailableColors(colorList);
@@ -157,11 +155,10 @@ const CategoryPage = () => {
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      {/* Breadcrumbs */}
+      {/* navigation */}
       <div className="flex items-center w-full justify-between">
         <div className="flex md:flex-row flex-col items-center justify-between w-full md:px-32">
           <PageNavigate />
-          {/* Desktop */}
           <div className="hidden md:flex items-center justify-between md:w-[700px] w-full px-4 pt-4">
             <span className="text-black/60 text-xs md:text-sm">
               Showing {sortedProducts.length > 0 ? startIndex + 1 : 0}-{endIndex} of {sortedProducts.length} Products
@@ -215,7 +212,6 @@ const CategoryPage = () => {
             </div>
 
           </div>
-          {/* Mobile */}
           <div className="md:hidden flex flex-col w-full px-4 pt-4 gap-1">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-black normal-case">

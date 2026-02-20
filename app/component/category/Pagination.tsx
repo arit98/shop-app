@@ -10,22 +10,22 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
 
-    // Helper to generate the sequence of page numbers
+    // get page array
     const getPageNumbers = () => {
         const pages: (number | string)[] = [];
 
         if (totalPages <= 7) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
         } else {
-            // Always show first 3 pages
+            // show start
             if (currentPage <= 3) {
                 pages.push(1, 2, 3, '...', totalPages - 2, totalPages - 1, totalPages);
             }
-            // Always show last 3 pages if we are near the end
+            // show end
             else if (currentPage >= totalPages - 2) {
                 pages.push(1, 2, 3, '...', totalPages - 2, totalPages - 1, totalPages);
             }
-            // Show first page, ellipsis, current-1, current, current+1, ellipsis, last page
+            // show middle
             else {
                 pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
             }
@@ -35,7 +35,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
 
     return (
         <div className="flex flex-wrap sm:flex-nowrap items-center justify-between w-full pt-6 mt-8 gap-4 md:px-10">
-            {/* Previous Button */}
+            {/* prev btn */}
             <button
                 onClick={() => onPageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -46,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 <span className="md:text-sm text-xs font-medium text-black">Previous</span>
             </button>
 
-            {/* Page Numbers */}
+            {/* page list */}
             <div className="order-1 sm:order-2 flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto justify-center">
                 {getPageNumbers().map((page, index) => (
                     <React.Fragment key={index}>
@@ -68,7 +68,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 ))}
             </div>
 
-            {/* Next Button */}
+            {/* next btn */}
             <button
                 onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}

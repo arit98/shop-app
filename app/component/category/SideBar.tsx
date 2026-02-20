@@ -10,12 +10,12 @@ interface SideBarProps {
 }
 
 const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColors = [] }: SideBarProps) => {
-    // State for interactive elements to mimic the "selected" look in the design
+    // select states
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
-    const [selectedSize, setSelectedSize] = useState('Large'); // Large selected by default
+    const [selectedSize, setSelectedSize] = useState('Large');
     const [priceRange, setPriceRange] = useState({ min: minBoundary, max: maxBoundary });
 
-    // Sync price range if boundaries change (e.g. data loaded)
+    // sync price range
     useEffect(() => {
         setPriceRange({ min: minBoundary, max: maxBoundary });
     }, [minBoundary, maxBoundary]);
@@ -55,14 +55,14 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColor
 
     return (
         <div className="md:w-80 w-72 border border-black/10 rounded-[20px] p-5 md:px-8 md:-mt-16 bg-white shrink-0 h-fit">
-            {/* Header */}
+            {/* filters header */}
             <div className="flex items-center justify-between mb-6 pb-6 border-b border-black/10">
                 <h3 className="text-xl font-bold text-black">Filters</h3>
                 <SlidersHorizontal className="md:flex hidden w-6 h-6 text-black/40" />
                 <X className="flex md:hidden w-6 h-6 text-black/40" />
             </div>
 
-            {/* Categories */}
+            {/* categories list */}
             <div className="flex flex-col gap-4 mb-6 pb-6 border-b border-black/10 text-black/60">
                 {categories.map((cat) => (
                     <div key={cat} className="flex items-center justify-between cursor-pointer hover:text-black transition-colors group">
@@ -72,14 +72,14 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColor
                 ))}
             </div>
 
-            {/* Price Filter */}
+            {/* price range section */}
             <div className="mb-6 pb-6 border-b border-black/10">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-black">Price</h3>
                     <ChevronUp className="w-5 h-5 text-black" />
                 </div>
                 <div className="px-2 pb-4">
-                    {/* Custom Dual Range Slider */}
+                    {/* range slider */}
                     <div className="relative w-full h-1.5 bg-[#F0F0F0] rounded-full mt-8 mb-6">
                         <div
                             className="absolute h-full bg-black rounded-full"
@@ -114,7 +114,7 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColor
                 </div>
             </div>
 
-            {/* Colors */}
+            {/* color select section */}
             <div className="mb-6 pb-6 border-b border-black/10">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-black">Colors</h3>
@@ -136,7 +136,7 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColor
                 </div>
             </div>
 
-            {/* Sizes */}
+            {/* size select section */}
             <div className="mb-6 pb-6 border-b border-black/10">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-black">Size</h3>
@@ -158,7 +158,7 @@ const SideBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableColor
                 </div>
             </div>
 
-            {/* Dress Style */}
+            {/* dress style section */}
             <div className="mb-6 pb-6">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-black">Dress Style</h3>

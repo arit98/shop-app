@@ -16,12 +16,12 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
     );
   }
 
-  // Remove trailing slash if present
+  // clean slug
   const cleanSlug = slug.endsWith('/') ? slug.slice(0, -1) : slug;
 
   try {
     const response = await fetch(
-      `https://wordpress-1591595-6226930.cloudwaysapps.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(
+      `${process.env.NEXT_API_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(
         cleanSlug
       )}`,
       { cache: 'no-store' }

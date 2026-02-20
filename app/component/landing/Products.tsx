@@ -32,8 +32,8 @@ const ProductsRow = ({ name, products }: { name: string; products: ProductType[]
     const isCategoryPage = pathname.includes("/category");
     const [visibleCount, setVisibleCount] = useState(isCategoryPage ? 100 : 4);
 
+    // sync visible count
     useEffect(() => {
-        // Reset visible count if products change (e.g. searching/filtering)
         if (!isCategoryPage) {
             setVisibleCount(4);
         } else {

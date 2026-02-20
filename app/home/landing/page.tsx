@@ -39,6 +39,7 @@ const LandingPage = () => {
   const [arrival, setArrival] = useState<ProductType[]>([]);
   const [topSelling, setTopSelling] = useState<ProductType[]>([]);
 
+  // fetch api data
   const fetchData = async () => {
     try {
       const response = await fetch('/api/arrival');
@@ -59,6 +60,7 @@ const LandingPage = () => {
     }
   };
 
+  // call on mount
   useEffect(() => {
     fetchData();
   }, []);

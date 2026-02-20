@@ -59,7 +59,7 @@ const Review = () => {
 
             let targetScroll = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
 
-            // Endless logic: If we hit the end, loop back to start/end
+            // scroll logic
             if (direction === "right" && scrollLeft + clientWidth >= scrollWidth - 10) {
                 targetScroll = 0;
             } else if (direction === "left" && scrollLeft <= 10) {
@@ -73,7 +73,7 @@ const Review = () => {
         }
     };
 
-    // Duplicate reviews multiple times to ensure we always have content to scroll to for the 'endless' feel
+    // repeat reviews
     const displayReviews = [...reviews, ...reviews, ...reviews, ...reviews, ...reviews];
 
     return (
@@ -130,7 +130,7 @@ const Review = () => {
                     ))}
                 </div>
 
-                {/* Visual Gradient Fades */}
+                {/* edge fades */}
                 <div className="absolute top-0 left-0 w-24 h-full bg-linear-to-r from-white via-white/80 to-transparent pointer-events-none z-10 hidden md:block" />
                 <div className="absolute top-0 right-0 w-24 h-full bg-linear-to-l from-white via-white/80 to-transparent pointer-events-none z-10 hidden md:block" />
             </div>

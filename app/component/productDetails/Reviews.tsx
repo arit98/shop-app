@@ -68,7 +68,7 @@ const Reviews = () => {
 
     return (
         <div className="mt-16">
-            {/* Tabs */}
+            {/* navigation tabs */}
             <div className="flex border-b border-black/10 mb-8">
                 {tabs.map((tab) => (
                     <button
@@ -87,7 +87,7 @@ const Reviews = () => {
 
             {activeTab === 'Rating & Reviews' ? (
                 <>
-                    {/* Header section */}
+                    {/* reviews header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-2">
                             <h2 className="text-2xl font-bold">All Reviews</h2>
@@ -108,7 +108,7 @@ const Reviews = () => {
                         </div>
                     </div>
 
-                    {/* Reviews Grid */}
+                    {/* reviews list */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         {reviews.map((review, idx) => (
                             <div key={idx} className="border border-black/10 rounded-[20px] p-7 flex flex-col gap-4">
@@ -139,7 +139,7 @@ const Reviews = () => {
                         ))}
                     </div>
 
-                    {/* Load More Button */}
+                    {/* load more */}
                     <div className="mt-12 flex justify-center">
                         <button className="px-10 py-4 border border-black/10 rounded-full font-medium hover:bg-black/5 transition-all text-black">
                             Load More Reviews

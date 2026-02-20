@@ -62,21 +62,21 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
 
     return (
         <div className="fixed inset-0 z-[100] md:hidden translate-y-18 pb-16">
-            {/* Overlay */}
+            {/* background overlay */}
             <div
                 className="absolute inset-0 bg-black/50"
                 onClick={() => dispatch(closeModal())}
             />
 
-            {/* Content */}
+            {/* modal content */}
             <div className="absolute bottom-0 left-0 right-0 h-[90vh] bg-white rounded-t-[20px] p-5 overflow-y-auto transition-transform pb-24">
-                {/* Header */}
+                {/* filters header */}
                 <div className="flex items-center justify-between mb-6 pb-6 border-b border-black/10">
                     <h3 className="text-xl font-bold text-black">Filters</h3>
                     <X onClick={() => dispatch(closeModal())} className="w-6 h-6 text-black/40 cursor-pointer" />
                 </div>
 
-                {/* Categories */}
+                {/* categories list */}
                 <div className="flex flex-col gap-4 mb-6 pb-6 border-b border-black/10 text-black/60">
                     {categories.map((cat) => (
                         <div key={cat} className="flex items-center justify-between cursor-pointer hover:text-black transition-colors group">
@@ -86,7 +86,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
                     ))}
                 </div>
 
-                {/* Price Filter */}
+                {/* price range section */}
                 <div className="mb-6 pb-6 border-b border-black/10">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-black">Price</h3>
@@ -127,7 +127,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
                     </div>
                 </div>
 
-                {/* Colors */}
+                {/* colors section */}
                 <div className="mb-6 pb-6 border-b border-black/10">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-black">Colors</h3>
@@ -149,7 +149,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
                     </div>
                 </div>
 
-                {/* Sizes */}
+                {/* sizes section */}
                 <div className="mb-6 pb-6 border-b border-black/10">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-black">Size</h3>
@@ -171,7 +171,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
                     </div>
                 </div>
 
-                {/* Dress Style */}
+                {/* dress style section */}
                 <div className="mb-6 pb-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-black">Dress Style</h3>
@@ -187,7 +187,7 @@ const MobileBar = ({ onApply, minBoundary = 0, maxBoundary = 10000, availableCol
                     </div>
                 </div>
 
-                {/* Apply Button */}
+                {/* submit filter */}
                 <button
                     onClick={handleApply}
                     className="w-full py-4 bg-black text-white rounded-full font-medium hover:bg-black/90 transition-all cursor-pointer active:scale-[0.98]"

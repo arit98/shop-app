@@ -8,7 +8,7 @@ const NavBar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <nav className="sticky top-0 left-0 w-full bg-white text-slate-900 py-5 px-4 md:px-32 flex items-center justify-between gap-4 md:gap-10 z-101">
-            {/* Logo Section */}
+            {/* logo */}
             <div className="flex items-center gap-4">
                 <button className="md:hidden p-1" onClick={() => setIsMenuOpen(true)}>
                     <Menu className="w-6 h-6" />
@@ -18,7 +18,7 @@ const NavBar = () => {
                 </Link>
             </div>
 
-            {/* Nav Links */}
+            {/* desktop links */}
             <ul className="hidden md:flex items-center gap-6 text-base whitespace-nowrap">
                 <li>
                     <Link href="/home/category" className="flex items-center gap-1 hover:opacity-70 transition-opacity">
@@ -31,7 +31,7 @@ const NavBar = () => {
                 <li><Link href="/brands" className="hover:opacity-70 transition-opacity">Brands</Link></li>
             </ul>
 
-            {/* Search Input */}
+            {/* search bar */}
             <div className="hidden md:flex flex-1 max-w-[600px] relative items-center">
                 <div className="absolute left-4 text-gray-500">
                     <Search className="w-5 h-5" />
@@ -43,7 +43,7 @@ const NavBar = () => {
                 />
             </div>
 
-            {/* Right Icons */}
+            {/* action buttons */}
             <div className="flex items-center gap-3">
                 <button className="md:hidden p-1">
                     <Search className="w-6 h-6" />
@@ -56,7 +56,7 @@ const NavBar = () => {
                 </Link>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* mobile navigation */}
             {isMenuOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 md:hidden" onClick={() => setIsMenuOpen(false)}>
                     <div className="fixed top-0 left-0 w-[80%] max-w-[300px] h-full bg-white p-6 shadow-xl transition-transform" onClick={e => e.stopPropagation()}>

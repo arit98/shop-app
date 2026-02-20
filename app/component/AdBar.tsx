@@ -12,7 +12,7 @@ const AdBar = () => {
     return (
         <div className="bg-black py-8 md:py-12 overflow-hidden w-full select-none">
             <div className="flex animate-marquee whitespace-nowrap">
-                {/* First Group of Brands */}
+                {/* brands row 1 */}
                 <div className="flex shrink-0 items-center justify-around gap-16 md:gap-32 px-8 min-w-full">
                     {brands.map((brand, index) => (
                         <span
@@ -24,7 +24,7 @@ const AdBar = () => {
                     ))}
                 </div>
 
-                {/* Duplicate Group for Seamless Marquee */}
+                {/* brands row 2 */}
                 <div className="flex shrink-0 items-center justify-around gap-16 md:gap-32 px-8 min-w-full">
                     {brands.map((brand, index) => (
                         <span

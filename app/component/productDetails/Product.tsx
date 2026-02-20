@@ -44,7 +44,7 @@ const Product = ({ id }: { id: string }) => {
 
         localStorage.setItem('cart', JSON.stringify(existingCart));
 
-        // Dispatch a custom event so other components (like a Navbar cart counter) can update
+        // update cart count
         window.dispatchEvent(new Event('cartUpdated'));
 
         alert("Added to cart!");
@@ -68,14 +68,13 @@ const Product = ({ id }: { id: string }) => {
                 setLoading(false);
             } else {
                 try {
+                    // api call
                     const response = await fetch(`/api/product/${id}`);
                     const data = await response.json();
                     if (data && !data.error) {
-                        // Extract images from content
                         const content = data.content?.rendered || "";
                         const images = (Array.from(content.matchAll(/<img[^>]+src=["']([^"']+)["']/gi)) as any[]).map(match => match[1]);
 
-                        // Extract metadata from excerpt
                         const excerpt = (data.excerpt?.rendered || "").replace(/<[^>]+>/g, "").trim();
                         const parts = excerpt.split(/\s+/);
                         const rating = parseFloat(parts[0]);
@@ -84,7 +83,6 @@ const Product = ({ id }: { id: string }) => {
                         const discount = parseFloat(parts[3]);
                         const colorsStr = parts[4] || "";
 
-                        // Map WordPress data to our product format
                         const mapped: any = {
                             id: data.id,
                             name: (data.title?.rendered || "")
@@ -102,7 +100,7 @@ const Product = ({ id }: { id: string }) => {
                                 const clean = c.trim();
                                 return {
                                     name: clean,
-                                    value: clean // Can be hex or name
+                                    value: clean
                                 };
                             }) : []
                         };
@@ -127,6 +125,7 @@ const Product = ({ id }: { id: string }) => {
 
     const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
+    // rating stars
     const renderStars = (rating: number) => {
         const stars = [];
         for (let i = 1; i <= 5; i++) {
@@ -143,9 +142,9 @@ const Product = ({ id }: { id: string }) => {
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Left Column: Product Images */}
+            {/* product images */}
             <div className="flex flex-col-reverse md:flex-row gap-4">
-                {/* Thumbnails */}
+                {/* thumbnails */}
                 <div className="flex flex-row md:flex-col gap-8">
                     {(product.images || [product.image]).map((img: string, idx: number) => (
                         <div
@@ -163,7 +162,7 @@ const Product = ({ id }: { id: string }) => {
                         </div>
                     ))}
                 </div>
-                {/* Main Image */}
+                {/* main image */}
                 <div className="flex-1 bg-[#F0EEED] rounded-[20px] p-4 flex items-center justify-center">
                     <Image
                         src={product.images ? product.images[currentImageIndex] : product.image}
@@ -175,7 +174,7 @@ const Product = ({ id }: { id: string }) => {
                 </div>
             </div>
 
-            {/* Right Column: Product Details */}
+            {/* product details */}
             <div className="flex flex-col">
                 <h1 className="text-4xl font-black uppercase mb-4 tracking-tight">{product.name}</h1>
 
