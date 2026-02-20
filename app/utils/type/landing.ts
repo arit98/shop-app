@@ -7,4 +7,5 @@ export interface ProductType {
     price: number;
     originalPrice?: number;
     discount?: string;
+    color?: string;
 }

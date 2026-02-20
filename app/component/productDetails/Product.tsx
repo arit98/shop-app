@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Star, StarHalf, Plus, Minus, ChevronRight } from 'lucide-react';
 
@@ -9,10 +9,13 @@ import { allProducts } from '@/app/utils/data';
 const Product = ({ id }: { id: string }) => {
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedColor, setSelectedColor] = useState('olive');
+    const [selectedColor, setSelectedColor] = useState('');
     const [selectedSize, setSelectedSize] = useState('Large');
     const [quantity, setQuantity] = useState(1);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+
+    const colors = product?.colors || [];
 
     const handleAddToCart = () => {
         if (!product) return;
@@ -25,7 +28,7 @@ const Product = ({ id }: { id: string }) => {
             size: selectedSize,
             color: selectedColor,
             quantity: quantity,
-            colorCode: colors.find(c => c.name === selectedColor)?.class || 'bg-black'
+            colorCode: colors.find((c: any) => c.name === selectedColor)?.value || 'black'
         };
 
         const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -53,10 +56,15 @@ const Product = ({ id }: { id: string }) => {
             const localProduct = !isNaN(numericId) ? allProducts.find(p => p.id === numericId) : allProducts.find(p => p.slug === id);
 
             if (localProduct) {
-                setProduct({
+                const mappedLocal = {
                     ...localProduct,
-                    images: localProduct.images || [localProduct.image]
-                });
+                    images: localProduct.images || [localProduct.image],
+                    colors: (localProduct as any).colors || []
+                };
+                setProduct(mappedLocal);
+                if (mappedLocal.colors.length > 0) {
+                    setSelectedColor(mappedLocal.colors[0].name);
+                }
                 setLoading(false);
             } else {
                 try {
@@ -69,10 +77,15 @@ const Product = ({ id }: { id: string }) => {
 
                         // Extract metadata from excerpt
                         const excerpt = (data.excerpt?.rendered || "").replace(/<[^>]+>/g, "").trim();
-                        const [rating, price, originalPrice, discount] = excerpt.split(/\s+/).map((v: any) => parseFloat(v));
+                        const parts = excerpt.split(/\s+/);
+                        const rating = parseFloat(parts[0]);
+                        const price = parseFloat(parts[1]);
+                        const originalPrice = parseFloat(parts[2]);
+                        const discount = parseFloat(parts[3]);
+                        const colorsStr = parts[4] || "";
 
                         // Map WordPress data to our product format
-                        const mapped = {
+                        const mapped: any = {
                             id: data.id,
                             name: (data.title?.rendered || "")
                                 .replace(/<[^>]+>/g, "")
@@ -84,9 +97,19 @@ const Product = ({ id }: { id: string }) => {
                             rating: rating || 4.5,
                             price: price || 210,
                             originalPrice: originalPrice || price || 210,
-                            discount: discount ? `-${discount}%` : "0%"
+                            discount: discount ? `-${discount}%` : "0%",
+                            colors: colorsStr ? colorsStr.split(',').map((c: string) => {
+                                const clean = c.trim();
+                                return {
+                                    name: clean,
+                                    value: clean // Can be hex or name
+                                };
+                            }) : []
                         };
                         setProduct(mapped);
+                        if (mapped.colors.length > 0) {
+                            setSelectedColor(mapped.colors[0].name);
+                        }
                     }
                 } catch (error) {
                     console.error("Error fetching product:", error);
@@ -101,12 +124,6 @@ const Product = ({ id }: { id: string }) => {
 
     if (loading) return <div>Loading...</div>;
     if (!product) return <div>Product Not Found</div>;
-
-    const colors = [
-        { name: 'olive', class: 'bg-[#4F4631]' },
-        { name: 'dark-green', class: 'bg-[#314F4A]' },
-        { name: 'dark-navy', class: 'bg-[#31344F]' }
-    ];
 
     const sizes = ['Small', 'Medium', 'Large', 'X-Large'];
 
@@ -188,15 +205,16 @@ const Product = ({ id }: { id: string }) => {
                 <div className="border-t border-black/10 py-6">
                     <p className="text-black/60 mb-4">Select Colors</p>
                     <div className="flex gap-4">
-                        {colors.map((color) => (
+                        {colors.map((color: any) => (
                             <button
                                 key={color.name}
                                 onClick={() => setSelectedColor(color.name)}
-                                className={`w-9 h-9 rounded-full ${color.class} flex items-center justify-center cursor-pointer transition-all ${selectedColor === color.name ? 'ring-1 ring-offset-2 ring-black' : ''}`}
+                                style={{ backgroundColor: color.value || color.name }}
+                                className={`w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-all ${selectedColor === color.name ? 'ring-1 ring-offset-2 ring-black' : ''}`}
                             >
                                 {selectedColor === color.name && (
                                     <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M14.6667 1L5.5 10.1667L1.33334 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M14.6667 1L5.5 10.1667L1.33334 6" stroke={color.name.toLowerCase() === '#ffffff' || color.name.toLowerCase() === 'white' ? 'black' : 'white'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 )}
                             </button>

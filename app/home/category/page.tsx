@@ -30,12 +30,13 @@ const mapPostsToProducts = (posts: any[]): ProductType[] =>
       /<[^>]+>/g,
       " ",
     );
-    const numbers = text.match(/[\d.]+/g) || [];
-    const rating = numbers[0] ? parseFloat(numbers[0]) : 0;
-    const price = numbers[1] ? Number(numbers[1]) : 0;
-    const originalPrice = numbers[2] ? Number(numbers[2]) : price;
-    const discount = numbers[3] ? `${numbers[3]}%` : undefined;
-    return { id, slug, name, image, rating, price, originalPrice, discount };
+    const parts = text.trim().split(/\s+/);
+    const rating = parts[0] ? parseFloat(parts[0]) : 0;
+    const price = parts[1] ? Number(parts[1]) : 0;
+    const originalPrice = parts[2] ? Number(parts[2]) : price;
+    const discount = parts[3] ? `${parts[3]}%` : undefined;
+    const color = parts[4] || "";
+    return { id, slug, name, image, rating, price, originalPrice, discount, color };
   });
 
 const CategoryPage = () => {
